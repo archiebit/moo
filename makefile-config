@@ -1,0 +1,124 @@
+# ----< Входные значения >------------------------------------
+#
+# build:
+#     target        : Цель построения в виде 'имя.расширение'.
+#     platform      : Целевая платформа.
+#     architecture  : Целевая архитектура.
+#
+#     configuration : Имя конфигурации в виде 'имя-режим'.
+#                     Имя может быть произвольным, режим
+#                     должен быть 'dev' или 'rel'.
+
+
+
+
+# ----< СЕКЦИИ >----------------------------------------------
+ifneq ($(findstring build,${MAKECMDGOALS}),)
+building := true
+endif
+# ------------------------------------------------------------
+
+
+
+
+# ----< ФУНКЦИИ >---------------------------------------------
+define path
+"$(subst /,\,${1})"
+endef
+
+define pathpack
+$(addprefix ",$(addsuffix ",$(subst /,\,${1})))
+endef
+# ------------------------------------------------------------
+
+
+
+
+# ----< BUILD: ПРОВЕРКА >-------------------------------------
+ifndef      configuration
+$(error Configuration name is not defined!)
+else ifndef target
+$(error Target is not defined!)
+else ifndef platform
+$(error Platform is not defined!)
+else ifndef architecture
+$(error Architecture is not defined!)
+endif
+
+
+ifneq ($(lastword $(subst -, ,${configuration})),dev)
+ifneq ($(lastword $(subst -, ,${configuration})),rel)
+$(error Configuration mode is incorrect!)
+endif
+endif
+
+
+ifneq ($(words $(subst /, ,$(subst \, ,$(subst ., ,${target})))),2)
+$(error Target is incorrect! It must be in form of 'filename.extension'.)
+endif
+
+
+ifneq     ($(words ${platform}),1)
+$(error Platform is incorrect!)
+else ifeq ($(findstring ${platform},windows),)
+$(error Platform is not supported!)
+endif
+
+
+ifneq     ($(words ${architecture}),1)
+$(error Architecture is incorrect!)
+else ifeq ($(findstring ${architecture},x86_64),)
+$(error Architecture is not supported!)
+endif
+# ------------------------------------------------------------
+
+
+
+
+# ----< BUILD: ОПРЕДЕЛЕНИЕ >----------------------------------
+ifdef building
+
+
+tmp     := out/${configuration}/tmp
+out     := out/${configuration}/out
+bin     := out/${configuration}/out/bin
+
+incdirs := $(addprefix -I ,${incdirs})
+libdirs := $(addprefix -L ,${libdirs})
+libs    := $(addprefix -l ,${libs})
+
+flags   := -std=c++20 -Wall -Wextra -pedantic -masm=intel
+
+ifeq ($(lastword $(subst -, ,${configuration})),dev)
+flags   += -O0 -g
+else
+flags   += -O2 -D NDEBUG
+endif
+
+ifeq ($(lastword $(subst ., ,${target})),dll)
+flags   += -fpic
+endif
+
+ifneq ($(and $(findstring ${platform},windows), $(findstring ${architecture},x86_64)),)
+flags   += --target=x86_64-pc-windows-gnu
+endif
+
+
+ifeq ($(findstring $(lastword $(subst ., ,${target})),exe dll),)
+override target := ${out}/${target}
+else
+override target := ${bin}/${target}
+endif
+
+
+.PHONY: build check
+
+check:
+	@if not exist $(call path,${tmp}) md $(call path,${tmp})
+	@if not exist $(call path,${bin}) md $(call path,${bin})
+
+build: check ${target}
+
+
+endif
+# ------------------------------------------------------------
