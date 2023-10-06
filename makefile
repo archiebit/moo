@@ -1,4 +1,4 @@
-incdirs :=
+incdirs := inc
 libdirs :=
 libs    :=
 
