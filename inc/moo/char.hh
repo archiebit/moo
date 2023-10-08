@@ -20,6 +20,27 @@ namespace moo
         ASCII,
         UTF08, UTF16, UTF32
     };
+
+
+    template <typename unit>
+    inline constexpr encoding native = ASCII;
+
+#if defined _WIN32
+    template <>
+    inline constexpr encoding native<char08> = ASCII;
+
+    template <>
+    inline constexpr encoding native<char16> = UTF16;
+#endif
+
+    template <>
+    inline constexpr encoding native<unit08> = UTF08;
+
+    template <>
+    inline constexpr encoding native<unit16> = UTF16;
+
+    template <>
+    inline constexpr encoding native<unit32> = UTF32;
 }
 
 
