@@ -402,3 +402,491 @@ namespace moo::text::symbol
         return size;
     }
 }
+
+namespace moo::text::stream
+{
+    template <typename unit>
+    static inline usize size_template( const unit units[], encoding option ) noexcept
+    {
+        constexpr auto native = moo::native<unit>;
+
+        usize total = 0;
+        usize place = 0;
+
+        if( units ) while( units[ place ] )
+        {
+            const usize x = symbol::size( units + place, native );
+            const usize y = symbol::size( units + place, option );
+
+            if( x == 0 or y == 0 ) break;
+
+            place += x;
+            total += y;
+        }
+
+        return total;
+    }
+
+#if defined _WIN32
+    usize size( const char08 units[], encoding option ) noexcept
+    {
+        return size_template( units, option );
+    }
+
+    usize size( const char16 units[], encoding option ) noexcept
+    {
+        return size_template( units, option );
+    }
+#endif
+    usize size( const unit08 units[], encoding option ) noexcept
+    {
+        return size_template( units, option );
+    }
+
+    usize size( const unit16 units[], encoding option ) noexcept
+    {
+        return size_template( units, option );
+    }
+
+    usize size( const unit32 units[], encoding option ) noexcept
+    {
+        return size_template( units, option );
+    }
+
+
+
+    template <typename unit>
+    static inline usize size_template( const unit units[], encoding option, usize codes ) noexcept
+    {
+        constexpr auto native = moo::native<unit>;
+
+        usize total = 0;
+        usize place = 0;
+
+        if( units ) while( codes > 0 )
+        {
+            const usize x = symbol::size( units + place, native );
+            const usize y = symbol::size( units + place, option );
+
+            if( x == 0 or y == 0 ) break;
+
+            place += x;
+            total += y;
+            codes -= 1;
+        }
+
+        return total;
+    }
+
+#if defined _WIN32
+    usize size( const char08 units[], encoding option, usize codes ) noexcept
+    {
+        return size_template( units, option, codes );
+    }
+
+    usize size( const char16 units[], encoding option, usize codes ) noexcept
+    {
+        return size_template( units, option, codes );
+    }
+#endif
+    usize size( const unit08 units[], encoding option, usize codes ) noexcept
+    {
+        return size_template( units, option, codes );
+    }
+
+    usize size( const unit16 units[], encoding option, usize codes ) noexcept
+    {
+        return size_template( units, option, codes );
+    }
+
+    usize size( const unit32 units[], encoding option, usize codes ) noexcept
+    {
+        return size_template( units, option, codes );
+    }
+
+
+
+    template <typename unit>
+    static inline usize leng_template( const unit units[], encoding option ) noexcept
+    {
+        constexpr auto native = moo::native<unit>;
+
+        usize total = 0;
+        usize place = 0;
+
+        if( units ) while( units[ place ] )
+        {
+            const usize x = symbol::size( units + place, native );
+            const usize y = symbol::size( units + place, option );
+
+            if( x == 0 or y == 0 ) break;
+
+            place += x;
+            total += 1;
+        }
+
+        return total;
+    }
+
+#if defined _WIN32
+    usize leng( const char08 units[], encoding option ) noexcept
+    {
+        return leng_template( units, option );
+    }
+
+    usize leng( const char16 units[], encoding option ) noexcept
+    {
+        return leng_template( units, option );
+    }
+#endif
+    usize leng( const unit08 units[], encoding option ) noexcept
+    {
+        return leng_template( units, option );
+    }
+
+    usize leng( const unit16 units[], encoding option ) noexcept
+    {
+        return leng_template( units, option );
+    }
+
+    usize leng( const unit32 units[], encoding option ) noexcept
+    {
+        return leng_template( units, option );
+    }
+
+
+
+    template <typename unit>
+    static inline usize leng_template( const unit units[], encoding option, usize size ) noexcept
+    {
+        constexpr auto native = moo::native<unit>;
+
+        usize total = 0;
+        usize place = 0;
+
+        if( units ) while( size > 0 )
+        {
+            const usize x = symbol::size( units + place, native );
+            const usize y = symbol::size( units + place, option );
+
+            if( x == 0 or y == 0 ) break;
+
+            place += x;
+            size  -= x;
+            total += 1;
+        }
+
+        return total;
+    }
+
+#if defined _WIN32
+    usize leng( const char08 units[], encoding option, usize size ) noexcept
+    {
+        return leng_template( units, option, size );
+    }
+
+    usize leng( const char16 units[], encoding option, usize size ) noexcept
+    {
+        return leng_template( units, option, size );
+    }
+#endif
+
+    usize leng( const unit08 units[], encoding option, usize size ) noexcept
+    {
+        return leng_template( units, option, size );
+    }
+
+    usize leng( const unit16 units[], encoding option, usize size ) noexcept
+    {
+        return leng_template( units, option, size );
+    }
+
+    usize leng( const unit32 units[], encoding option, usize size ) noexcept
+    {
+        return leng_template( units, option, size );
+    }
+}
+
+namespace moo::text::stream
+{
+    template <typename target, typename source>
+    static inline usize turn_template( target spot[], const source from[] ) noexcept
+    {
+        constexpr auto native = moo::native<source>;
+        constexpr auto option = moo::native<target>;
+
+        usize total = 0;
+        usize place = 0;
+        usize where = 0;
+
+        if( spot and from ) while( from[ place ] )
+        {
+            upoint code;
+
+            const usize x = symbol::size( from + place, native );
+            const usize y = symbol::size( from + place, option );
+
+            if( x == 0 or y == 0 ) break;
+
+            symbol::decode( code, from + place );
+            symbol::encode( code, spot + where );
+
+            place += x;
+            where += y;
+            total += 1;
+        }
+
+        return total;
+    }
+
+#if defined _WIN32
+    usize turn( char16 spot[], const char08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit08 spot[], const char08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit16 spot[], const char08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit32 spot[], const char08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+
+    usize turn( char08 spot[], const char16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit08 spot[], const char16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit16 spot[], const char16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit32 spot[], const char16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+#endif
+
+#if defined _WIN32
+    usize turn( char08 spot[], const unit08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( char16 spot[], const unit08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+#endif
+    usize turn( unit16 spot[], const unit08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit32 spot[], const unit08 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+
+#if defined _WIN32
+    usize turn( char08 spot[], const unit16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( char16 spot[], const unit16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+#endif
+    usize turn( unit08 spot[], const unit16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit32 spot[], const unit16 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+
+#if defined _WIN32
+    usize turn( char08 spot[], const unit32 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( char16 spot[], const unit32 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+#endif
+    usize turn( unit08 spot[], const unit32 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+    usize turn( unit16 spot[], const unit32 from[] ) noexcept
+    {
+        return turn_template( spot, from );
+    }
+
+
+
+
+    template <typename target, typename source>
+    static inline usize turn_template( target spot[], const source from[], usize codes ) noexcept
+    {
+        constexpr auto native = moo::native<source>;
+        constexpr auto option = moo::native<target>;
+
+        usize total = 0;
+        usize place = 0;
+        usize where = 0;
+
+        if( spot and from ) while( codes > 0 )
+        {
+            upoint code;
+
+            const usize x = symbol::size( from + place, native );
+            const usize y = symbol::size( from + place, option );
+
+            if( x == 0 or y == 0 ) break;
+
+            symbol::decode( code, from + place );
+            symbol::encode( code, spot + where );
+
+            place += x;
+            where += y;
+            total += 1;
+            codes -= 1;
+        }
+
+        return total;
+    }
+
+#if defined _WIN32
+    usize turn( char16 spot[], const char08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit08 spot[], const char08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit16 spot[], const char08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit32 spot[], const char08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+
+    usize turn( char08 spot[], const char16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit08 spot[], const char16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit16 spot[], const char16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit32 spot[], const char16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+#endif
+
+#if defined _WIN32
+    usize turn( char08 spot[], const unit08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( char16 spot[], const unit08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+#endif
+    usize turn( unit16 spot[], const unit08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit32 spot[], const unit08 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+
+#if defined _WIN32
+    usize turn( char08 spot[], const unit16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( char16 spot[], const unit16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+#endif
+    usize turn( unit08 spot[], const unit16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit32 spot[], const unit16 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+
+#if defined _WIN32
+    usize turn( char08 spot[], const unit32 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( char16 spot[], const unit32 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+#endif
+    usize turn( unit08 spot[], const unit32 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+    usize turn( unit16 spot[], const unit32 from[], usize codes ) noexcept
+    {
+        return turn_template( spot, from, codes );
+    }
+
+}
